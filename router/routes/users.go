@@ -1,10 +1,11 @@
 package routes
 
 import (
+	"encoding/json"
 	"github.com/gorilla/mux"
 	"go-playground/database"
-	"log"
 	"net/http"
+	"strconv"
 )
 
 func UsersRoute(r *mux.Router, db database.DBImplementation) error {
@@ -20,16 +21,29 @@ func manyUsersGetHandler(db database.DBImplementation) http.HandlerFunc {
 		if err != nil {
 			panic(err)
 		}
-		log.Println("USERS", users)
+
+		if err := json.NewEncoder(w).Encode(users); err != nil {
+			panic(err)
+		}
 	}
 }
 
 func singleUserGetHandler(db database.DBImplementation) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		users, err := db.GetManyUsers()
+		stringId := mux.Vars(r)["id"]
+
+		id, err := strconv.Atoi(stringId)
 		if err != nil {
 			panic(err)
 		}
-		log.Println("USERS", users)
+
+		user, err := db.GetSingleUser(id)
+		if err != nil {
+			panic(err)
+		}
+
+		if err := json.NewEncoder(w).Encode(user); err != nil {
+			panic(err)
+		}
 	}
 }
