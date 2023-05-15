@@ -18,7 +18,7 @@ func CheckPasswordHash(password, hash string) error {
 
 func CreateJWTString(username string) (string, error) {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-		"authorized": true,
+		"authorized": false,
 		"user":       username,
 	})
 	secret := []byte(os.Getenv("JWT_SECRET"))

@@ -10,6 +10,7 @@ require (
 )
 
 require (
+	github.com/DATA-DOG/go-sqlmock v1.5.0 // indirect
 	github.com/golang-jwt/jwt/v5 v5.0.0 // indirect
 	golang.org/x/crypto v0.9.0 // indirect
 )

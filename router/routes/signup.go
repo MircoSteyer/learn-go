@@ -4,11 +4,12 @@ import (
 	"encoding/json"
 	"github.com/gorilla/mux"
 	"go-playground/database"
+	"go-playground/router/middleware"
 	"net/http"
 )
 
 func SignupRoute(r *mux.Router, db database.DBImplementation) error {
-	r.HandleFunc("/signup", signupPostHandler(db)).Methods("POST")
+	r.HandleFunc("/signup", middleware.Chain(signupPostHandler(db), middleware.Logging())).Methods("POST")
 
 	return nil
 }

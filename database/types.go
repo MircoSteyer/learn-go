@@ -5,6 +5,8 @@ import (
 	"time"
 )
 
+type DBConnector func(driverName, connectionString string) (*sql.DB, error)
+
 type Database struct {
 	*sql.DB
 }

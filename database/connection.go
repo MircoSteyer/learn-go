@@ -1,12 +1,11 @@
 package database
 
 import (
-	"database/sql"
 	"fmt"
 	"os"
 )
 
-func Start() (DBImplementation, error) {
+func Start(connector DBConnector) (DBImplementation, error) {
 	var (
 		user     = os.Getenv("MYSQL_USER")
 		password = os.Getenv("MYSQL_PASSWORD")
@@ -16,7 +15,7 @@ func Start() (DBImplementation, error) {
 
 	connectionString := fmt.Sprintf("%s:%s@tcp(%s)/%s?parseTime=true", user, password, address, dbName)
 
-	db, err := sql.Open("mysql", connectionString)
+	db, err := connector("mysql", connectionString)
 	database := &Database{DB: db}
 	if err != nil {
 		return nil, err

@@ -4,11 +4,12 @@ import (
 	"encoding/json"
 	"github.com/gorilla/mux"
 	"go-playground/database"
+	"go-playground/router/middleware"
 	"net/http"
 )
 
 func LoginRoute(r *mux.Router, db database.DBImplementation) error {
-	r.HandleFunc("/login", loginPostHandler(db)).Methods("POST")
+	r.HandleFunc("/login", middleware.Chain(loginPostHandler(db), middleware.Logging())).Methods("POST")
 
 	return nil
 }
@@ -22,7 +23,8 @@ func loginPostHandler(db database.DBImplementation) http.HandlerFunc {
 		}
 		token, err := db.LoginUser(credentials)
 		if err != nil {
-			panic(err)
+			http.Error(w, "Invalid Credentials", http.StatusUnauthorized)
+			return
 		}
 
 		if err := json.NewEncoder(w).Encode(token); err != nil {

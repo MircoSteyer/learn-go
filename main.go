@@ -1,6 +1,7 @@
 package main
 
 import (
+	"database/sql"
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/joho/godotenv"
 	"go-playground/database"
@@ -12,7 +13,7 @@ func main() {
 		panic(err)
 	}
 
-	db, err := database.Start()
+	db, err := database.Start(sql.Open)
 	if err != nil {
 		panic(err)
 	}
