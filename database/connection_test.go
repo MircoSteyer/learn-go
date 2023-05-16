@@ -7,15 +7,15 @@ import (
 )
 
 func TestStart(t *testing.T) {
-	dbMock, expectationMock, err := sqlmock.New(sqlmock.MonitorPingsOption(true))
+	db, mock, err := sqlmock.New(sqlmock.MonitorPingsOption(true))
 	dbConnectorMock := func(_ string, _ string) (*sql.DB, error) {
-		return dbMock, nil
+		return db, nil
 	}
 	if err != nil {
 		t.Errorf("an error '%s' was not expected when opening a stub database connection", err)
 	}
 
-	expectationMock.ExpectPing()
+	mock.ExpectPing()
 
 	_, err = Start(dbConnectorMock)
 
@@ -23,7 +23,7 @@ func TestStart(t *testing.T) {
 		t.Errorf("an error '%s' was not expected when starting the database", err)
 	}
 
-	if err := expectationMock.ExpectationsWereMet(); err != nil {
+	if err := mock.ExpectationsWereMet(); err != nil {
 		t.Errorf("there were unfulfilled expectations: %s", err)
 	}
 }
