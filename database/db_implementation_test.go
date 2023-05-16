@@ -3,7 +3,9 @@ package database
 import (
 	"database/sql"
 	"github.com/DATA-DOG/go-sqlmock"
+	"github.com/golang-jwt/jwt"
 	"log"
+	"os"
 	"reflect"
 	"testing"
 	"time"
@@ -107,6 +109,39 @@ func TestDatabase_GetSingleUser(t *testing.T) {
 	_, err = db.GetSingleUser(userId)
 	if err == nil {
 		t.Errorf("an error was expected when executing on an empty table")
+	}
+
+	if err := mock.ExpectationsWereMet(); err != nil {
+		t.Errorf("there were unfulfilled expectations: %s", err)
+	}
+}
+
+func TestDatabase_SignupUser(t *testing.T) {
+	user := User{
+		3, Credentials{"testuser3", "testpassword3"}, time.Now(),
+	}
+
+	db, _, mock, err := setupTests([]User{})
+	if err != nil {
+		t.Errorf("an error '%s' was not expected when setting up the test", err)
+	}
+
+	mock.ExpectExec("INSERT INTO users").WithArgs(user.Username, sqlmock.AnyArg(), sqlmock.AnyArg()).WillReturnResult(sqlmock.NewResult(1, 1))
+
+	tokenString, err := db.SignupUser(user.Credentials)
+	if err != nil {
+		t.Errorf("an error '%s' was not expected when signing up a user", err)
+	}
+
+	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
+		return []byte(os.Getenv("JWT_SECRET")), nil
+	})
+	if err != nil {
+		t.Errorf("an error '%s' was not expected when parsing a token", err)
+	}
+
+	if !token.Valid {
+		t.Errorf("expected token to be valid, got %v", token.Valid)
 	}
 
 	if err := mock.ExpectationsWereMet(); err != nil {
